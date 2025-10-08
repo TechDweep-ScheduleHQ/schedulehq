@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  --primary-bg: #000000; /* Black background */
+  --primary-text: #ffffff; /* White text */
+  --white-bg: #ffffff; /* White text */
+  --secondary-bg: #1f2937; /* Gray-900 for component backgrounds */
+  --card-bg: #1e2939; /* Gray-800 for cards */
+  --input-bg: #495465; /* Gray-700 for inputs */
+  --button-bg: #ffffff; /* White for buttons */
+  --border-bg: #ffffff; 
+  --borderGray-bg: #293445;
+  --darkGray-bg: #101828;
+  /* --lightGray-text: #8b9e98; */
+  --lightGray-text: #d1d5db;
+  --button-text: #000000; /* Black for button text */
+  --button-hover-bg: #f0f0f0; /* Light gray for button hover */
+  --disabled-color: #808080; /* Gray for disabled elements */
+}
+
+/* for white color */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); 
+}

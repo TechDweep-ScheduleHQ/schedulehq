@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node",              // Ensures Node.js module resolution
+    "allowSyntheticDefaultImports": true,    // Allows default imports from modules with CommonJS exports
+    "forceConsistentCasingInFileNames": true // Prevents issues with file name casing
+  },
+  "include": ["src/**/*"],                  // Includes all files in src folder
+  "exclude": ["node_modules", "dist"]       // Excludes node_modules and dist
+}

@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int      @id @default(autoincrement())
+  username          String   @unique
+  email             String   @unique
+  password          String?
+  googleId          String?  @unique
+  verified          Boolean  @default(false)
+  verificationToken String?
+  bio               String?
+  profilePhotoUrl   String?
+  timezone          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  calenderConnections   CalenderConnection[]
+  videoConnections      VideoConnection[]
+  availabilities        Availability[]
+}
+
+
+
+model CalenderConnection{
+    id                  Int           @id @default(autoincrement())
+    userId              Int
+    type                String        // e.g., "google", "outlook"
+    accessToken         String
+    refreshToken        String?
+    expiryDate          DateTime?
+    calenderId          String?
+    createdAt           DateTime      @default(now())
+    updatedAt           DateTime      @updatedAt
+
+    user                User          @relation(fields: [userId], references: [id] , onDelete: Cascade)
+}
+
+
+model VideoConnection{
+    id                  Int            @id @default(autoincrement())
+    userId              Int      
+    type                String         // e.g,  "zoom","googlemeet"
+    accessToken         String
+    refreshToken        String?
+    expiryDate          DateTime?
+    accountId           String? 
+    createdAt           DateTime       @default(now())
+    updatedAt           DateTime       @updatedAt
+
+    user                User           @relation(fields: [userId] , references: [id] , onDelete: Cascade)
+}
+
+
+model Availability{
+    id                  Int            @id @default(autoincrement())
+    userId              Int
+    day                 String
+    enabled             Boolean        @default(true)
+    timeSlots           Json
+    createdAt           DateTime       @default(now())
+    updatedAt           DateTime       @updatedAt
+
+    user                User           @relation(fields: [userId],references:[id],onDelete:Cascade)
+}

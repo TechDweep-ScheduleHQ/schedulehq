@@ -1,0 +1,80 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:17.6
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres@123
+      POSTGRES_DB: "ScheduleHQ-Saas"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: schedulehq_backend
+    depends_on:
+      - postgres
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres%40123@postgres:5432/ScheduleHQ-Saas?schema=public"
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./backend:/app    # Live reload
+      - /app/node_modules # Prevent overwriting node_modules
+    command: npm run dev
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: schedulehq_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    volumes:
+      - ./frontend:/app   # Hot reload
+      - /app/node_modules # Prevent overwriting node_modules
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+
+  prisma-studio:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: prisma_studio
+    depends_on:
+      - postgres
+    ports:
+      - "5555:5555"
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@123@postgres:5432/ScheduleHQ-Saas"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npx prisma studio --port 5555
+
+volumes:
+  postgres_data:
