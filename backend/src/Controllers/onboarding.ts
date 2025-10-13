@@ -5,8 +5,11 @@ import axios from 'axios';
 import { AuthRequest } from '../Middleware/auth';
 import dotenv from 'dotenv';
 import { Prisma } from "@prisma/client";
+import { redisConfig } from "../Utilis/redis";
+import { getUserOnboardingCacheKey } from "../Utilis/helper";
 dotenv.config();
 
+const CACHE_EXPIRES = 3600
 
 // integrate google calender 
 const OAuth2Client = new google.auth.OAuth2(
@@ -256,9 +259,19 @@ export const completeSetupOnboarding = async (req: AuthRequest, res: Response) =
                     }
                 })
             }
-        })
+        });
+        
+        // cache data for redis 
+        const cachedData = {
+            timezone : data.timezone,
+            bio : data.bio,
+            availability:  data.availability
+        }
 
-        return res.status(200).json({ status: true, message: "User Onboarded successfully!" })
+        const redisClient = await redisConfig.getClient();
+        await redisClient.setEx(getUserOnboardingCacheKey(userId),CACHE_EXPIRES , JSON.stringify(cachedData));
+
+        return res.status(200).json({ status: true, message: "User Onboarded successfully!"})
     }
     catch (error: any) {
         console.log(error.message);

@@ -248,6 +248,7 @@ export const emailLogin = async (req: Request, res: Response) => {
 
 // Google signup and login
 
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 export const googleLoginOAuth = async (req: Request, res: Response) => {
     const { idToken } = req.body;
@@ -277,15 +278,33 @@ export const googleLoginOAuth = async (req: Request, res: Response) => {
         const cachedUser = await redisClient.get(getUserEmailCacheKey(email));
         let user = cachedUser ? JSON.parse(cachedUser) : null;
 
+        // Helper to generate unique username
+        const generateUniqueUsername = async (name: string | undefined) => {
+            const baseName = (name || "user").replace(/\s+/g, '').toLowerCase();
+            let username = "";
+            let exists = true;
+
+            while (exists) {
+                const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+                username = `${baseName}_${randomSuffix}`;
+
+                const existingUser = await prisma.user.findUnique({ where: { username } });
+                exists = !!existingUser;
+            }
+
+            return username;
+        };
+
         if (!user) {
             let dbUser = await prisma.user.findUnique({ where: { email } });
             if (!dbUser) {
                 // create new user
+                const generatedUsername = await generateUniqueUsername(name);
                 const newUser = await prisma.user.create({
                     data: {
                         email,
                         googleId,
-                        username: name || `user_${googleId}`,
+                        username: generatedUsername,
                         verified: true,
                         verificationToken: null,
                         password: ''
@@ -294,7 +313,7 @@ export const googleLoginOAuth = async (req: Request, res: Response) => {
 
                 user = {
                     id: newUser.id,
-                    email: newUser.id,
+                    email: newUser.email,
                     username: newUser.username,
                     verified: newUser.verified
                 }
