@@ -3,6 +3,7 @@ import cors from 'cors';
 import routes from './index';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { redisConfig } from './Utilis/redis';
 
 dotenv.config();
 const app = express();
@@ -19,9 +20,19 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use('/api',routes);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
+  await redisConfig.getClient();
   console.log(`Server running on port ${PORT}`);
 });
 
-export {prisma};
+process.on('SIGTERM', async () => {
+  console.log('Shutting down server...');
+  server.close(async () => {
+    await redisConfig.disconnect();
+    await prisma.$disconnect();
+    console.log('Server shut down');
+    process.exit(0);
+  });
+});
 
+export {prisma};

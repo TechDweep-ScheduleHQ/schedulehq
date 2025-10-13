@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { google } from 'googleapis';
 import { prisma } from '../server';
 import axios from 'axios';
-import { validateEmail } from "../Utilis/validation";
 import { AuthRequest } from '../Middleware/auth';
 import dotenv from 'dotenv';
 import { Prisma } from "@prisma/client";
