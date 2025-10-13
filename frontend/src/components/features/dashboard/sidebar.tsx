@@ -1,27 +1,62 @@
 import type React from "react";
-import { CalendarCheck, CalendarDays, Settings, X, LogOut, BadgeDollarSign, ChevronsRight } from "lucide-react";
+import {
+  CalendarCheck,
+  CalendarDays,
+  Settings,
+  X,
+  LogOut,
+  BadgeDollarSign,
+  ChevronsRight,
+} from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Event from "./pages/events";
+import Event from "./pages/events/EventType";
 import Meeting from "./pages/meeting";
 import Availability from "./pages/availability";
 import Setting from "./pages/setting";
+import { useAppDispatch } from "../../../redux/store/hook";
+import { logout } from "../../../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
-type NavKey = "events" | "mettings" | "availability" |"settings";
+type NavKey = "events" | "mettings" | "availability" | "settings";
 
 const navItems: { key: NavKey; label: string; icon: React.ReactNode }[] = [
-  { key: "events", label: "Events", icon: <CalendarCheck size={20} aria-hidden="true" className="shrink-0" /> },
-  { key: "mettings", label: "Meetings", icon: <CalendarDays size={20} aria-hidden="true" className="shrink-0" /> },
-  { key: "availability", label: "Availability", icon: <CalendarDays size={20} aria-hidden="true" className="shrink-0" /> },
-  { key: "settings", label: "Setting", icon: <Settings size={20} aria-hidden="true" className="shrink-0" /> },
+  {
+    key: "events",
+    label: "Events",
+    icon: <CalendarCheck size={20} aria-hidden="true" className="shrink-0" />,
+  },
+  {
+    key: "mettings",
+    label: "Meetings",
+    icon: <CalendarDays size={20} aria-hidden="true" className="shrink-0" />,
+  },
+  {
+    key: "availability",
+    label: "Availability",
+    icon: <CalendarDays size={20} aria-hidden="true" className="shrink-0" />,
+  },
+  {
+    key: "settings",
+    label: "Setting",
+    icon: <Settings size={20} aria-hidden="true" className="shrink-0" />,
+  },
 ];
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [active, setActive] = useState<NavKey>("events");
 
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate()
+
+  const logoutHandler = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
   return (
-    <div className="min-h-screen w-full bg-primary-bg text-primary-text">
+    <div className="min-h-screen w-full bg-[var(--primary-bg)]">
       <div className="flex">
         {/* Sidebar */}
         <motion.aside
@@ -37,7 +72,7 @@ export default function Sidebar() {
               aria-label="Navigate"
               className="rounded-md p-2 text-white hover:text-primary-text flex"
             >
-              <BadgeDollarSign size={30} aria-hidden="true" /> 
+              <BadgeDollarSign size={30} aria-hidden="true" />
             </button>
             <button
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -48,7 +83,11 @@ export default function Sidebar() {
               className="rounded-md p-2  hover:text-primary-text"
               style={{ position: "relative", zIndex: 40 }}
             >
-              {collapsed ? <ChevronsRight size={28} className="ml-3" aria-hidden="true" /> : <X size={20} aria-hidden="true" className="text-white"/>}
+              {collapsed ? (
+                <ChevronsRight size={28} className="ml-3" aria-hidden="true" />
+              ) : (
+                <X size={20} aria-hidden="true" className="text-white" />
+              )}
             </button>
           </div>
 
@@ -67,7 +106,9 @@ export default function Sidebar() {
                       }`}
                     >
                       <span className="text-primary-text">{item.icon}</span>
-                      <span className={`text-sm ${collapsed ? "hidden" : ""}`}>{item.label}</span>
+                      <span className={`text-sm ${collapsed ? "hidden" : ""}`}>
+                        {item.label}
+                      </span>
                     </button>
                   </li>
                 );
@@ -77,6 +118,7 @@ export default function Sidebar() {
 
           <div className="mt-auto border-t border-[color:var(--borderGray-bg)] p-4">
             <button
+              onClick={logoutHandler}
               aria-label="Logout"
               className={`${
                 collapsed
@@ -91,7 +133,7 @@ export default function Sidebar() {
         </motion.aside>
 
         {/* Main content */}
-        <main className="relative flex-1 min-h-screen bg-[var(--white-bg)]  p-6">
+        <main className="relative flex-1 p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
@@ -99,7 +141,7 @@ export default function Sidebar() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
-              className="max-w-5xl"
+              // className="max-w-5xl"
             >
               {active === "events" && <Event />}
               {active === "mettings" && <Meeting />}

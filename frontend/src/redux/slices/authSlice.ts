@@ -1,6 +1,6 @@
 import { createSlice , createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../constants/axiosInstane";
-import type {SignupValues , LoginValues , SignupResponse , LoginResponse , VerifyEmailResponse , ForgotPasswordValues , ForgotPasswordResponse , ResetPasswordValues ,ResetPasswordResponse , GoogleLoginResponse , GoogleLoginValues , TimeZoneResponse}  from "../types/auth";
+import type {SignupValues , LoginValues , SignupResponse , LoginResponse , VerifyEmailResponse , ForgotPasswordValues , ForgotPasswordResponse , ResetPasswordValues ,ResetPasswordResponse , GoogleLoginResponse , GoogleLoginValues , TimeZoneResponse, User}  from "../types/auth";
 import { AUTH_URL } from "../../constants/api";
 
 interface AuthState{
@@ -9,7 +9,7 @@ interface AuthState{
     success: boolean;
     isAuthenticated: boolean;
     token: string | null;
-    user:{id:number,email:string,username:string} | null;
+    user: User | null;
     verificationStatus: 'idle' | 'pending' | 'success' | 'failed';
     verificationMessage: string | null;
     forgotPasswordStatus: 'idle' | 'pending' | 'success' | 'failed';

@@ -98,7 +98,7 @@ export const googleCalenderCallback = async (req: AuthRequest, res: Response) =>
                 }
             })
         }
-        res.redirect(returnTo);
+        res.redirect(`${returnTo}&googleCalender=true`);
     }
     catch (error: any) {
         console.log(error.message);
@@ -193,7 +193,7 @@ export const zoomCallback = async (req: AuthRequest, res: Response) => {
                 }
             })
         }
-        res.redirect(returnTo);
+        res.redirect(`${returnTo}&zoom=true`);
     }
     catch (error: any) {
         console.log(error.message);
