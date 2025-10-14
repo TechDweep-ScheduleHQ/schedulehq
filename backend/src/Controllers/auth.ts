@@ -7,9 +7,7 @@ import { OAuth2Client } from "google-auth-library";
 import moment from 'moment-timezone';
 import dotenv from 'dotenv';
 import { redisConfig } from '../Utilis/redis';
-import { getUserCacheKey, getTokenCacheKey, getUsernameCacheKey, getUserEmailCacheKey, TIMEZONE_CACHE_KEY, getVerifiedCacheKey } from '../Utilis/helper';
-import { json } from 'zod';
-import { cached } from 'zod/v4/core/util.cjs';
+import { getUserCacheKey, getTokenCacheKey, getUsernameCacheKey, getUserEmailCacheKey, getVerifiedCacheKey } from '../Utilis/helper';
 dotenv.config();
 
 const JWT_EXPIRES_IN = 9 * 24 * 60 * 60;
@@ -251,11 +249,13 @@ export const emailLogin = async (req: Request, res: Response) => {
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 export const googleLoginOAuth = async (req: Request, res: Response) => {
-    const { idToken } = req.body;
+  const { idToken } = req.body;
 
-    if (!idToken || typeof idToken !== "string") {
-        return res.status(400).json({ status: false, message: "Google ID token is required!" });
-    }
+  if (!idToken || typeof idToken !== "string") {
+    return res
+      .status(400)
+      .json({ status: false, message: "Google ID token is required!" });
+  }
 
     try {
         const redisClient = await redisConfig.getClient();
@@ -270,9 +270,11 @@ export const googleLoginOAuth = async (req: Request, res: Response) => {
         const googleId = payload?.sub;
         const name = payload?.name;
 
-        if (!email || !googleId) {
-            return res.status(400).json({ status: false, message: "Invalid Google token payload!" });
-        }
+    if (!email || !googleId) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Invalid Google token payload!" });
+    }
 
         // check redis cache for user email
         const cachedUser = await redisClient.get(getUserEmailCacheKey(email));
@@ -368,20 +370,24 @@ export const googleLoginOAuth = async (req: Request, res: Response) => {
         await redisClient.setEx(getTokenCacheKey(user.id), JWT_EXPIRES_IN, authToken);
         await redisClient.setEx(getVerifiedCacheKey(user.verified), JWT_EXPIRES_IN, JSON.stringify(user));
 
-        return res.status(200).json({
-            status: true,
-            message: "Google login successful!",
-            authToken,
-            user: {
-                id: user.id,
-                email: user.email,
-                username: user.username,
-            },
-        });
-    } catch (error: any) {
-        console.error("Google login error:", error.message);
-        return res.status(500).json({ status: false, message: "Internal server error!" });
-    }
+    return res.status(200).json({
+      status: true,
+      message: "Google login successful!",
+      authToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        availabilities: user.availabilities,
+        timezone: user.timezone
+      },
+    });
+  } catch (error: any) {
+    console.error("Google login error:", error.message);
+    return res
+      .status(500)
+      .json({ status: false, message: "Internal server error!" });
+  }
 };
 
 

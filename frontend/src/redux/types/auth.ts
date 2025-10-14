@@ -1,81 +1,97 @@
-export interface SignupValues{
-  username:string,
-  email:string,
-  password:string
+export interface User {
+  id: number,
+  username: string;
+  email: string;
+  password?: string;
+  timezone?:string;
+  availabilities?: Availability[] | null;
 }
 
-export interface SignupResponse{
-  status:boolean,
-  message:string
+export interface Availability {
+  id: number;
+  userId: number;
+  day: string;
+  enabled: boolean;
+  timeSlots: { start: string; end: string }[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface LoginValues{
-    email:string,
-    password:string
+export interface SignupValues {
+  username: string;
+  email: string;
+  password: string;
 }
 
-export interface LoginResponse{
-  status:boolean,
-  message:string,
-  authToken:string,
-  user:{
-    id:number,
-    email:string,
-    username:string
-  }
+export interface SignupResponse {
+  status: boolean;
+  message: string;
 }
 
-export interface VerifyEmailResponse{
-  status:boolean,
-  message:string,
-  authToken:string,
-  user:{
-    id:number,
-    email:string,
-    username:string
-  }
+export interface LoginValues {
+  email: string;
+  password: string;
 }
 
-
-export interface ForgotPasswordValues{
-  email:string
+export interface LoginResponse {
+  status: boolean;
+  message: string;
+  authToken: string;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+  };
 }
 
-export interface ForgotPasswordResponse{
-  status:boolean,
-  message:string
+export interface VerifyEmailResponse {
+  status: boolean;
+  message: string;
+  authToken: string;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+  };
 }
 
-export interface ResetPasswordValues{
-  token:string,
-  password:string,
-  confirmPassword:string
+export interface ForgotPasswordValues {
+  email: string;
 }
 
-export interface ResetPasswordResponse{
-  status:boolean,
-  message:string
+export interface ForgotPasswordResponse {
+  status: boolean;
+  message: string;
 }
 
-
-export interface GoogleLoginValues{
-  idToken:string
+export interface ResetPasswordValues {
+  token: string;
+  password: string;
+  confirmPassword: string;
 }
 
-export interface GoogleLoginResponse{
-  status:boolean,
-  message:string,
-  authToken:string,
-  user:{
-    id:number,
-    email:string,
-    username:string 
-  }
+export interface ResetPasswordResponse {
+  status: boolean;
+  message: string;
 }
 
+export interface GoogleLoginValues {
+  idToken: string;
+}
 
-export interface TimeZoneResponse{
-  status:boolean,
-  message:string,
-  timezones:string[]
+export interface GoogleLoginResponse {
+  status: boolean;
+  message: string;
+  authToken: string;
+  user: {
+    id: number;
+    email: string;
+    username: string;
+  };
+}
+
+export interface TimeZoneResponse {
+  status: boolean;
+  message: string;
+  timezones: string[];
 }

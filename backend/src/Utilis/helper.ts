@@ -5,6 +5,8 @@ export const getUsernameCacheKey = (username : string) => `username:${username}`
 export const getUserEmailCacheKey = (email : string) => `email:${email}`;
 export const getVerifiedCacheKey = (verified : boolean) => `verified:${verified}`;
 export const getUserOnboardingCacheKey = (userId : number) => `user:onboarding:${userId}`;
+export const getUserEventCacheKey = (userId : number) => `event:userId:${userId}`;
+
 
 export const TIMEZONE_CACHE_KEY = 'timezones';
 

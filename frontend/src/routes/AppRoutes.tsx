@@ -7,9 +7,10 @@ import ForgotPassword from '../components/features/auth/forgotPassword';
 import ResetPassword from '../components/features/auth/resetPassword';
 import GetStarted from '../components/features/onboarding/GetStarted';
 import Sidebar from '../components/features/dashboard/sidebar';
-import Events from '../components/features/dashboard/pages/events';
+import Events from '../components/features/dashboard/pages/events/EventType';
 import Meeting from '../components/features/dashboard/pages/meeting';
 import Availability from '../components/features/dashboard/pages/availability';
+import { BookingPage } from '../components/features/client/BookingPage';
 // import PrivateRoute from './PrivateRoutes';
 // import { useAppSelector } from '../redux/store/hook';
 
@@ -30,6 +31,7 @@ const AppRoutes: React.FC = () => {
         <Route path='/events' element={<Events />} />
         <Route path='/meetings' element={<Meeting />} />
         <Route path='/availability' element={<Availability />} />
+        <Route path='/:username/:event' element={<BookingPage />} />
       </Routes>
 
     </div>

@@ -24,6 +24,7 @@ model User {
   calenderConnections   CalenderConnection[]
   videoConnections      VideoConnection[]
   availabilities        Availability[]
+  events                Event[]
 }
 
 
@@ -69,3 +70,20 @@ model Availability{
 
     user                User           @relation(fields: [userId],references:[id],onDelete:Cascade)
 }
+
+
+
+model Event {
+     id                 Int             @id @default(autoincrement())
+     userId             Int 
+     title              String
+     url                String
+     description        String
+     duration           String
+     hidden             Boolean         @default(false)
+     createdAt          DateTime        @default(now())
+     updatedAt          DateTime        @updatedAt
+
+     user               User            @relation(fields: [userId],references:[id],onDelete:Cascade)
+}
+
