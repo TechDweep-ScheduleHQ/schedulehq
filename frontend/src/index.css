@@ -22,3 +22,58 @@
 input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(1); 
 }
+
+/* Custom Scrollbar */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borderGray-bg) var(--darkGray-bg);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--darkGray-bg);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--borderGray-bg);
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--lightGray-text);
+}
+
+@media (max-width: 768px) {
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+}
+
+[data-theme="light"] {
+  --scrollbar-track: var(--white-bg);
+  --scrollbar-thumb: var(--borderGray-bg);
+}
+
+[data-theme="light"] * {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+[data-theme="light"] *::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+[data-theme="light"] *::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+}
+
+[data-theme="light"] *::-webkit-scrollbar-thumb:hover {
+  background: var(--button-hover-bg);
+}

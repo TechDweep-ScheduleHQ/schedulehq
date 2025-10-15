@@ -7,28 +7,38 @@ const TimeSlotsDisplay: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
+
   const clockFormate = searchParams.get("clockFormate") || "12";
-  const selectedDay =
-    new Date(searchParams.get("date") || new Date()) || new Date();
+  const dateParam = searchParams.get("date");
+  const selectedDay = dateParam ? new Date(dateParam) : new Date();
 
   const durationMinutes = Number(searchParams.get("duration") || "45");
 
-  // Find the availability for the selected day
+  // Safely check if valid date
+  const isValidDate = !isNaN(selectedDay.getTime());
+  if (!isValidDate) {
+    return <div>Invalid date provided</div>;
+  }
+
+  // Get weekday name from selectedDay (e.g., "monday")
+  const dayName = selectedDay
+    .toLocaleDateString("en-US", { weekday: "long" })
+    .toLowerCase();
+
+  // Match availability by weekday
   const availability = user?.availabilities?.find(
-    (a: Availability) =>
-      a.day.toLowerCase() === selectedDay.toISOString().toLowerCase() &&
-      a.enabled
+    (a: Availability) => a.day.toLowerCase() === dayName && a.enabled
   );
 
   if (!availability) return <div>No slots available</div>;
 
-  // Helper: convert "HH:mm" string to minutes
+  // Helper: convert "HH:mm" to total minutes
   const timeStrToMinutes = (time: string) => {
     const [h, m] = time.split(":").map(Number);
     return h * 60 + m;
   };
 
-  // Helper: format time string
+  // Helper: format time according to clock format
   const formatTime = (minutes: number) => {
     const hour = Math.floor(minutes / 60);
     const minute = minutes % 60;
@@ -43,7 +53,7 @@ const TimeSlotsDisplay: React.FC = () => {
     }
   };
 
-  // Generate all time slots based on duration
+  // Generate time slots
   const slots: string[] = [];
   availability.timeSlots.forEach((slot) => {
     const start = timeStrToMinutes(slot.start);
@@ -54,12 +64,12 @@ const TimeSlotsDisplay: React.FC = () => {
   });
 
   return (
-    <div className="overflow-y-auto flex-1 space-y-2">
+    <div className="overflow-y-auto flex-1 w-full space-y-2">
       {slots.map((time) => (
         <button
           key={time}
           onClick={() => setSelectedTime(time)}
-          className={`flex items-center justify-center gap-2 px-3 py-2 w-full max-w-[90%] rounded-lg text-sm transition cursor-pointer
+          className={`flex items-center justify-center gap-2 px-3 py-2 w-full md:max-w-[90%] rounded-lg text-sm transition cursor-pointer
             ${
               selectedTime === time
                 ? "bg-blue-600 text-white"
