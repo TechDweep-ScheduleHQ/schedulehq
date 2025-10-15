@@ -3,7 +3,6 @@ import { prisma } from '../server';
 import { redisConfig } from '../Utilis/redis';
 import dotenv from 'dotenv';
 import { getUserEventCacheKey } from '../Utilis/helper';
-import { date } from 'zod';
 dotenv.config();
 
 const CACHE_EXPIRES = 3600
