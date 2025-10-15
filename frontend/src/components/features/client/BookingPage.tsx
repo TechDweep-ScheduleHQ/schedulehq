@@ -1,28 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { Globe, ChevronLeft, ChevronRight, Clock } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { Autocomplete, TextField } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hook";
 import { fetchTimezones } from "../../../redux/slices/authSlice";
 import { toast } from "react-toastify";
+import TimeSlotsDisplay from "./TimeSlotsDisplay";
 
 export const BookingPage: React.FC = () => {
   // ---------- STATE ----------
   const { timezoneStatus, timezones, error, user } = useAppSelector(
     (state) => state.auth
   );
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const today = new Date();
+  console.log(user);
   const [currentMonth, setCurrentMonth] = useState<number>(
     new Date().getMonth()
   );
   const [currentYear, setCurrentYear] = useState<number>(
     new Date().getFullYear()
   );
-  const [selectedDuration, setSelectedDuration] = useState<string>("45m");
-  const [clockFormate, setClockFormate] = useState("12");
+  // const [selectedDuration, setSelectedDuration] = useState<string>("45m");
   const [timezone, setTimezone] = useState<string | undefined>(user?.timezone);
   const { username, event } = useParams<{ username: string; event: string }>();
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const clockFormate = searchParams.get("clockFormate") || "12";
+  const selectedDuration = Number(searchParams.get("duration") || "45");
+  const selectedDate = new Date(searchParams.get("date") || new Date()) || new Date();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -38,34 +42,15 @@ export const BookingPage: React.FC = () => {
     }
   }, [timezoneStatus, error]);
 
-  // ---------- STATIC DATA ----------
-  const times: string[] = [
-    "8:30am",
-    "8:40am",
-    "8:50am",
-    "9:00am",
-    "9:10am",
-    "9:20am",
-    "9:30am",
-    "9:40am",
-    "9:50am",
-    "10:00am",
-  ];
-  const durations: string[] = ["10m", "45m", "50m"];
-  const today = new Date();
+  const durations: number[] = [10, 45, 50];
 
   // ---------- EFFECT ----------
   useEffect(() => {
-    if (username && event) {
-      console.log("Username:", username);
-      console.log("Event:", event);
-    }
-
     // Default select: next working day (not Sat/Sun)
     const next = new Date(today);
     next.setDate(today.getDate() + 1);
     while ([0, 6].includes(next.getDay())) next.setDate(next.getDate() + 1);
-    setSelectedDate(next);
+    setSearchParams({ date: next.toString() });
   }, [username, event]);
 
   // ---------- HELPERS ----------
@@ -96,11 +81,12 @@ export const BookingPage: React.FC = () => {
       date <= new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const isWeekend = [0, 6].includes(date.getDay());
     if (isPast || isWeekend) return;
-    setSelectedDate(date);
+    console.log(date);
+    setSearchParams({ date: date.toString() });
   };
 
-  const handleSelectDuration = (duration: string) =>
-    setSelectedDuration(duration);
+  const handleSelectDuration = (duration: number) =>
+    setSearchParams({ duration: duration.toString() });
 
   const handleNextMonth = () => {
     if (currentMonth === 11) {
@@ -147,7 +133,7 @@ export const BookingPage: React.FC = () => {
             <div className="flex gap-2 justify-center border px-2 py-1 rounded-xl">
               {durations.map((duration) => (
                 <button
-                  key={duration}
+                  key={duration.toString()}
                   onClick={() => handleSelectDuration(duration)}
                   className={`px-3 py-1 text-sm cursor-pointer rounded-md transition ${
                     selectedDuration === duration
@@ -155,7 +141,7 @@ export const BookingPage: React.FC = () => {
                       : "text-[var(--lightGray-text)]"
                   }`}
                 >
-                  {duration}
+                  {`${duration}m`}
                 </button>
               ))}
             </div>
@@ -170,14 +156,14 @@ export const BookingPage: React.FC = () => {
           {/* Timezone */}
           <div className="flex items-center gap-2 text-[var(--lightGray-text)] w-full">
             <Globe size={18} />
-            <div className="mb-4 w-full">
+            <div className="w-2/3">
               <Autocomplete
                 options={timezones.length > 0 ? timezones : ["Asia/Kolkata"]}
                 value={timezone}
                 onChange={(_, newValue) =>
                   setTimezone(newValue || "Asia/Kolkata")
                 }
-                disableClearable
+                // disableClearable
                 ListboxProps={{
                   sx: {
                     backgroundColor: "var(--primary-bg)",
@@ -206,6 +192,9 @@ export const BookingPage: React.FC = () => {
                       input: {
                         color: "white",
                         whiteSpace: "normal",
+                      },
+                      "& .MuiAutocomplete-clearIndicator": {
+                        color: "var(--primary-text)",
                       },
                       "& .MuiAutocomplete-popupIndicator": {
                         color: "white",
@@ -326,7 +315,7 @@ export const BookingPage: React.FC = () => {
             </p>
             <div className="flex gap-2 p-1 bg-[var(--primary-bg)] rounded-xl">
               <button
-                onClick={() => setClockFormate("12")}
+                onClick={() => setSearchParams({ clockFormate: "12" })}
                 className={`px-2 py-1 text-sm rounded-md text-[var(--primary-text)] cursor-pointer ${
                   clockFormate === "12" && "bg-[var(--secondary-bg)]"
                 }`}
@@ -334,7 +323,7 @@ export const BookingPage: React.FC = () => {
                 12h
               </button>
               <button
-                onClick={() => setClockFormate("24")}
+                onClick={() => setSearchParams({ clockFormate: "24" })}
                 className={`px-2 py-1 text-sm rounded-md text-[var(--primary-text)] cursor-pointer ${
                   clockFormate === "24" && "bg-[var(--secondary-bg)]"
                 }`}
@@ -346,15 +335,7 @@ export const BookingPage: React.FC = () => {
 
           {/* Time Slots */}
           <div className="overflow-y-auto flex-1 space-y-2">
-            {times.map((time) => (
-              <button
-                key={time}
-                className="flex items-center justify-center gap-2 px-3 py-2 w-full max-w-[90%] rounded-lg bg-[var(--darkGray-bg)] hover:bg-[var(--input-bg)] text-sm transition cursor-pointer"
-              >
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
-                <span>{time}</span>
-              </button>
-            ))}
+            <TimeSlotsDisplay />
           </div>
         </div>
       </div>
