@@ -7,7 +7,7 @@ import ForgotPassword from '../components/features/auth/forgotPassword';
 import ResetPassword from '../components/features/auth/resetPassword';
 import GetStarted from '../components/features/onboarding/GetStarted';
 import Sidebar from '../components/features/dashboard/sidebar';
-import Events from '../components/features/dashboard/pages/events/EventType';
+import Events from '../components/features/dashboard/pages/events/EventTypesPage';
 import Meeting from '../components/features/dashboard/pages/meeting';
 import Availability from '../components/features/dashboard/pages/availability';
 import { BookingPage } from '../components/features/client/BookingPage';

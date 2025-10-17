@@ -16,3 +16,11 @@ export const ONBOARD_URL = {
   ZOOM: `${BASE_URL}/onboard/auth/zoom`,
   COMPLETE_ONBOARDING: `${BASE_URL}/onboard/setup/onboarding`,
 };
+
+export const EVENT_URL = {
+  CREATE: `${BASE_URL}/event/createEvents`,
+  GET_EVENTS: `${BASE_URL}/event/getEvents`,
+  DELETE: `${BASE_URL}/event/deleteEvents`,
+  EDIT: `${BASE_URL}/event/editEvents`,
+  HIDE: `${BASE_URL}/event/hideEvents`,
+};

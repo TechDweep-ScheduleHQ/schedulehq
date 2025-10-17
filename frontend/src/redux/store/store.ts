@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authReducer from '../slices/authSlice';
 import onboardReducer from '../slices/onboardSlice';
+import eventReducer from '../slices/eventSlice';
 
 import {
   persistReducer,
@@ -18,13 +19,14 @@ import storage from "redux-persist/lib/storage";
 const rootReducer = combineReducers({
   auth: authReducer,
   onboard: onboardReducer,
+  event: eventReducer
 });
 
 // Persist config
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"], // persist only auth slice
+  whitelist: ["auth"],
 };
 
 

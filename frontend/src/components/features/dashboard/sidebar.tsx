@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Event from "./pages/events/EventType";
+import Event from "./pages/events/EventTypesPage";
 import Meeting from "./pages/meeting";
 import Availability from "./pages/availability";
 import Setting from "./pages/setting";
@@ -57,7 +57,7 @@ export default function Sidebar() {
 
   return (
     <div className="min-h-screen w-full bg-[var(--primary-bg)]">
-      <div className="flex">
+      <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
         <motion.aside
           aria-label="Sidebar"
@@ -133,7 +133,7 @@ export default function Sidebar() {
         </motion.aside>
 
         {/* Main content */}
-        <main className="relative flex-1 p-6">
+        <main className="flex-1 overflow-y-auto p-6">
           <AnimatePresence mode="wait">
             <motion.div
               key={active}

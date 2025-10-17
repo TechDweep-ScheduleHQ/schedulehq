@@ -36,13 +36,11 @@ export const createEvent = async (req: Request, res: Response) => {
     const cacheKey = getUserEventCacheKey(Number(userId));
     await redisClient.setEx(cacheKey, CACHE_EXPIRES, JSON.stringify(newEvent));
 
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "Events created successfully!",
-        newEvent,
-      });
+    return res.status(200).json({
+      status: true,
+      message: "Events created successfully!",
+      event: newEvent,
+    });
   } catch (error: any) {
     console.log(error.message);
     return res
@@ -144,12 +142,10 @@ export const editEvent = async (req: Request, res: Response) => {
     });
 
     if (!validEvent) {
-      return res
-        .status(400)
-        .json({
-          status: false,
-          message: "Event not found or not belong to this user!",
-        });
+      return res.status(400).json({
+        status: false,
+        message: "Event not found or not belong to this user!",
+      });
     }
 
     const updatedEvent = await prisma.event.update({
@@ -163,13 +159,11 @@ export const editEvent = async (req: Request, res: Response) => {
       },
     });
 
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "Event updated successfully",
-        updatedEvent,
-      });
+    return res.status(200).json({
+      status: true,
+      message: "Event updated successfully",
+      event: updatedEvent,
+    });
   } catch (error: any) {
     console.log(error.message);
     return res
@@ -200,25 +194,21 @@ export const deleteEvent = async (req: Request, res: Response) => {
     });
 
     if (!validEvent) {
-      return res
-        .status(400)
-        .json({
-          status: false,
-          message: "Event not found or not belong to this user!",
-        });
+      return res.status(400).json({
+        status: false,
+        message: "Event not found or not belong to this user!",
+      });
     }
 
     const deletedEvents = await prisma.event.delete({
       where: { id: validEvent.id },
     });
 
-    return res
-      .status(200)
-      .json({
-        status: false,
-        message: "Event deleted successfully!!",
-        deletedEvents,
-      });
+    return res.status(200).json({
+      status: true,
+      message: "Event deleted successfully!!",
+      event: deletedEvents,
+    });
   } catch (error: any) {
     console.log(error.message);
     return res
@@ -246,15 +236,13 @@ export const hideEvent = async (req: Request, res: Response) => {
       where: { id: Number(eventId), userId: Number(userId) },
     });
     if (!validEvent) {
-      return res
-        .status(400)
-        .json({
-          status: false,
-          message: "Invalid Event or event not belong to this user!",
-        });
+      return res.status(400).json({
+        status: false,
+        message: "Invalid Event or event not belong to this user!",
+      });
     }
 
-    const events = await prisma.event.update({
+    const event = await prisma.event.update({
       where: { id: validEvent.id },
       data: {
         hidden: hidden,
@@ -263,7 +251,7 @@ export const hideEvent = async (req: Request, res: Response) => {
     });
     return res
       .status(200)
-      .json({ status: true, message: "Event hide successfully!", events });
+      .json({ status: true, message: "Event hide successfully!", event });
   } catch (error: any) {
     console.log(error.message);
     return res

@@ -1,33 +1,40 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useAppSelector } from "../../../../../redux/store/hook";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../../redux/store/hook";
+import { createEvent, editEvent } from "../../../../../../redux/slices/eventSlice";
+import type { Event } from "../../../../../../redux/types/event";
 
 interface AddEventTypeModalProps {
+  eventType: "create" | "edit" | "copy";
   onClose: () => void;
-  onSubmit: (values: EventFormValues) => void;
+  event?: Event | null;
 }
 
 interface EventFormValues {
   title: string;
   url: string;
   description: string;
-  duration: number;
+  duration: string;
 }
 
 const AddEventTypeModal: React.FC<AddEventTypeModalProps> = ({
+  eventType,
   onClose,
-  onSubmit,
+  event = null,
 }) => {
   const initialValues: EventFormValues = {
-    title: "",
-    url: "",
-    description: "",
-    duration: 15,
+    title: eventType !== "create" ? event?.title || "" : "",
+    url: eventType !== "create" ? event?.url.split("/").pop() || "" : "",
+    description: eventType !== "create" ? event?.description || "" : "",
+    duration: eventType !== "create" ? event?.duration || "" : "",
   };
 
-  const user = useAppSelector((state)=> state.auth.user);
-  console.log(user);
+  const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
@@ -38,8 +45,48 @@ const AddEventTypeModal: React.FC<AddEventTypeModalProps> = ({
       .required("Duration is required"),
   });
 
+  const submitHandler = async (values: EventFormValues) => {
+    if (!user?.id) return;
+
+    if (eventType === "edit") {
+      if (!event?.id) return;
+
+      const eventPayload = {
+        title: values.title,
+        url: values.url,
+        description: values.description,
+        duration: values.duration.toString(),
+      };
+
+      dispatch(
+        editEvent({ userId: user?.id, eventId: event?.id, eventPayload })
+      );
+    } else {
+      const eventPayload = {
+        userId: user.id,
+        title: values.title,
+        url: `${import.meta.env.VITE_FRONTEND_URL}/${user.username}/${
+          values.url
+        }`,
+        description: values.description,
+        duration: values.duration.toString(),
+      };
+
+      dispatch(createEvent(eventPayload));
+    }
+
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-900/90 bg-opacity-70 z-50">
+    <div
+      onClick={(e) => {
+        const target = e.target as HTMLElement;
+        if (target.id === "container") onClose();
+      }}
+      id="container"
+      className="fixed inset-0 flex items-center justify-center bg-gray-900/90 bg-opacity-70 z-50"
+    >
       <div className="bg-[var(--primary-bg)] rounded-2xl shadow-lg md:w-[55%] w-full p-6 text-[var(--primary-text)]">
         <h2 className="text-xl font-semibold mb-4">Add a new event type</h2>
         <p className="text-sm text-[var(--lightGray-text)] mb-6">
@@ -49,10 +96,7 @@ const AddEventTypeModal: React.FC<AddEventTypeModalProps> = ({
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
-          onSubmit={(values) => {
-            onSubmit(values);
-            onClose();
-          }}
+          onSubmit={submitHandler}
         >
           {({ isSubmitting }) => (
             <Form className="flex flex-col gap-4">
@@ -84,13 +128,13 @@ const AddEventTypeModal: React.FC<AddEventTypeModalProps> = ({
                   {/* Editable part */}
                   <Field
                     type="text"
-                    name="urlSuffix"
+                    name="url"
                     placeholder="your-event"
-                    className="flex-1 py-2 bg-[var(--input-bg)] text-white outline-none border-none"
+                    className={`flex-1 py-2 bg-[var(--input-bg)] text-white outline-none border-none`}
                   />
                 </div>
                 <ErrorMessage
-                  name="urlSuffix"
+                  name="url"
                   component="div"
                   className="text-red-400 text-xs mt-1"
                 />
@@ -140,7 +184,7 @@ const AddEventTypeModal: React.FC<AddEventTypeModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 rounded-md bg-[var(--button-bg)] text-[var(--button-text)] hover:bg-[var(--button-hover-bg)] transition disabled:opacity-60"
+                  className="px-4 py-2 rounded-md cursor-pointer bg-[var(--button-bg)] text-[var(--button-text)] hover:bg-[var(--button-hover-bg)] transition disabled:opacity-60"
                 >
                   Continue
                 </button>
